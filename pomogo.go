@@ -7,32 +7,32 @@ import (
 
 //Time is represented in seconds
 type config struct {
-	workTime      uint32
-	breakTime     uint32
-	longBreakTime uint32
+	workTime      int
+	breakTime     int
+	longBreakTime int
 }
 
-func startBreak(break_time uint32) {
+func startBreak(breakTime int) {
 	fmt.Printf("**************************************************************************\n")
 	fmt.Printf("Break has started.\n")
 	doneTimer := make(chan bool)
-	go startTimer(break_time, doneTimer, "Break")
+	go startTimer(breakTime, doneTimer, "Break")
 	<-doneTimer
 
 }
 
-func startPomodoro(work_time uint32, pomodoros_done int) {
+func startPomodoro(workTime int, pomodorosDone int) {
 	fmt.Printf("**************************************************************************\n")
 	fmt.Printf("Timer has started.\n")
-	fmt.Printf("Number of Pomodoros done so far %d\n", pomodoros_done)
-	done_timer := make(chan bool)
-	go startTimer(work_time, done_timer, "Timer")
-	<-done_timer
+	fmt.Printf("Number of Pomodoros done so far %d\n", pomodorosDone)
+	doneTimer := make(chan bool)
+	go startTimer(workTime, doneTimer, "Timer")
+	<-doneTimer
 }
-func startTimer(break_time uint32, done chan<- bool, mode string) {
-	counter := break_time
+func startTimer(breakTime int, done chan<- bool, mode string) {
+	counter := breakTime
 	fmt.Printf("%s set for: %2d minutes.\n", mode, counter/60)
-	for ; counter > 0; counter-- {
+	for ; counter >= 0; counter-- {
 		fmt.Printf("\r%02d:%02d minutes left.", counter/60, counter%60)
 		time.Sleep(time.Second)
 	}
@@ -48,8 +48,9 @@ func beep() {
 }
 
 func main() {
-	conf := config{workTime: 1, breakTime: 300, longBreakTime: 900}
+	conf := config{workTime: 1500, breakTime: 300, longBreakTime: 900}
 	pomodorosDone := 0
+
 	for {
 		startPomodoro(conf.workTime, pomodorosDone)
 		pomodorosDone++
